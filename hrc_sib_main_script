@@ -5,5 +5,5 @@ source /home/mta/bin/reset_param
 setenv PFILES "${PDIRS}:${SYSPFILES}" 
 set path = (/home/ascds/DS.release/bin/  $path)
 
-perl /data/mta/MTA/bin/find_shield_rate.perl
+perl /data/mta/MTA/bin/hrc_sib_find_shield_rate.perl
 

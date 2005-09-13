@@ -5,7 +5,7 @@ TASK = HRC_SIB
 
 include /data/mta/MTA/include/Makefile.MTA
 
-BIN  = hrc_sib_wrap_script hrc_sib_main_script find_shield_rate.perl
+BIN  = hrc_sib_wrap_script hrc_sib_main_script hrc_sib_find_shield_rate.perl
 
 DOC  = README
 
