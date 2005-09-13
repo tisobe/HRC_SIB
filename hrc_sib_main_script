@@ -1,0 +1,9 @@
+cd /data/mta/Script/HRC/Bkg/Exc/
+rm -rf param
+mkdir param
+source /home/mta/bin/reset_param
+setenv PFILES "${PDIRS}:${SYSPFILES}" 
+set path = (/home/ascds/DS.release/bin/  $path)
+
+perl /data/mta/MTA/bin/find_shield_rate.perl
+
