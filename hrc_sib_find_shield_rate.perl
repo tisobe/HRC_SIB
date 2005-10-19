@@ -57,7 +57,7 @@ $today = "$year:$uyday:00:00:00";
 open(OUT, '>./ds_file');
 print OUT 'columns=mtahrc..hrcveto_avg',"\n";
 print OUT 'timestart=1999:202:00:00:00',"\n";
-print OUT 'timeend='."$today\n";
+print OUT 'timestop='."$today\n";
 close(OUT);
 
 #
@@ -214,29 +214,18 @@ system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgpl
 system("rm ds_file memo pgplot.ps veto.fits sheild_events.dat");
 
 
-open(OUT, '> /data/mta/www/mta_hrc_sib/hrc_sib.html');
+open(OUT, '> /data/mta/www/mta_hrc/Trending/ihrc_bkg.html');
 
 print OUT '<html>',"\n";
 print OUT '<head><title>HRC SIB</title></head>',"\n";
 print OUT '<body TEXT="#000000" BGCOLOR="#FFFFFF">',"\n";
 print OUT '<center>',"\n";
-print OUT '<h2>Time History of HRC Instrument Background </h2>',"\n";
+print OUT '<h2>Time History of HRC Istrument Background </h2>',"\n";
+print OUT '',"\n";
+print OUT '<img src ="./Bkg_data/shiled_rate.gif" width="500" height="500">',"\n";
+print OUT '',"\n";
 print OUT '</center>',"\n";
-print OUT '',"\n";
-print OUT '<p>',"\n";
-print OUT 'The HRC background is dominated by the effects of charged particles',"\n";
-print OUT ' (see <a href="http://hea-www.harvard.edu/~juda/memos/hrc_bkg/time_history.html">memo by Juda</a>).',"\n";
-print OUT 'We extracted shield rates from <a href="http://cxc.harvard.edu/cgi-bin/DataSeeker/dataseeker.cgi">dataseeker</a>',"\n";
-print OUT "database, and plot agaist time. To avoid an effect of the Earth's radiaton belts, data with a geocentric","\n";
-print OUT 'distance larger than 80,000km is used. Although dataseeker data are logged in 5 min average, we convert it into',"\n";
-print OUT 'one day average. The shield rate is count/sec, and time unit is day starting at a launch date (DOM).',"\n";
-print OUT '</p>',"\n";
-print OUT '',"\n";
-print OUT '',"\n";
-print OUT '<img src ="./shiled_rate.gif" width="500" height="500">',"\n";
-print OUT '',"\n";
 print OUT '<br><br>',"\n";
-print OUT '',"\n";
 
 if($month < 10){
 	$month = '0'."$month";
