@@ -207,14 +207,14 @@ for($m = 0; $m < $dtot; $m++){
 pglab("Time (DOM)", "HRC Shield Rate (per Sec)", 'HRC Shield Rate Averaged Over One Day');
 pgclos();
 
-$out_plot = '/data/mta/www/mta_hrc_sib/shiled_rate.gif';
+$out_plot = '/data/mta/www/mta_hrc/Trending/Bkg_data/shiled_rate.gif';
 
 system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|pnmcrop|pnmflip -r270 |ppmtogif > $out_plot");
 
 system("rm ds_file memo pgplot.ps veto.fits sheild_events.dat");
 
 
-open(OUT, '> /data/mta/www/mta_hrc/Trending/ihrc_bkg.html');
+open(OUT, '> /data/mta/www/mta_hrc/Trending/hrc_bkg.html');
 
 print OUT '<html>',"\n";
 print OUT '<head><title>HRC SIB</title></head>',"\n";
@@ -237,4 +237,27 @@ if($umday < 10){
 print OUT 'Last Update:',"$month/$umday/$year\n";
 
 close(OUT);
+
+#
+#---- update the main hrc trending page
+#
+
+open(FH, '/data/mta_www/mta_hrc/Trending/hrc_trend.html');
+open(OUT, '>./temp_out.html');
+
+$chk = 0;
+while(<FH>){
+        chomp $_;
+        if($_ =~ /Time History of the HRC Background/ && $chk == 0){
+                print OUT '<li><a href = "#bkg">Time History of the HRC Background</a>';
+                print OUT " (last update: $month-$umday-$year)\n";
+                $chk++;
+        }else{
+                print OUT "$_\n";
+        }
+}
+close(OUT);
+close(FH);
+
+system("mv ./temp_out.html /data/mta_www/mta_hrc/Trending/hrc_trend.html");
 
