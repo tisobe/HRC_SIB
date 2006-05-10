@@ -1,5 +1,32 @@
 
-find_shield_rate.perl: this script extract HRC shield rate from
-dataseeker and plots agaisnt time to represent HRC SIB.
 
+-------------------
+hrc_sib_wrap_script
+-------------------
+a wrap script for hrc_sib_main_script
+
+
+-------------------
+hrc_sib_main_script
+-------------------
+a contol script to run find_shield_rate.perl
+
+
+---------------------
+find_shield_rate.perl 
+---------------------
+
+this script extract HRC shield rate from dataseeker and plots agaisnt 
+time to represent HRC SIB.
+
+Input
+/data/mta/DataSeeker/data/repository/aorbital.rdb
+dataseeker:	sheild_events.dat
+
+
+Output
+/data/mta/www/mta_hrc/Trending/Bkg_data/shiled_rate.gif
+/data/mta/www/mta_hrc/Trending/hrc_bkg.html
+
+you need to have an access to dataseeker
 
