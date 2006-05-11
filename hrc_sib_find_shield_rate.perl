@@ -64,7 +64,7 @@ close(OUT);
 #--- call dataseeker
 #
 
-system(""punlearn dataseeker; dataseeker.pl infile=ds_file print=yes outfile=veto.fits");
+system("punlearn dataseeker; dataseeker.pl infile=ds_file print=yes outfile=veto.fits");
 system("dmlist \"veto.fits[cols time,shevart_avg]\" outfile=sheild_events.dat opt=data");
 
 @time = ();
