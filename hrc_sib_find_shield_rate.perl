@@ -7,7 +7,7 @@ use PGPLOT;
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: 09/13/05									#
+#	last update: 07/15/09									#
 #												#
 #################################################################################################
 
@@ -209,7 +209,7 @@ pgclos();
 
 $out_plot = '/data/mta/www/mta_hrc/Trending/Bkg_data/shiled_rate.gif';
 
-system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|pnmcrop|pnmflip -r270 |ppmtogif > $out_plot");
+system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|pnmcrop|pnmflip -r270 |ppmtogif > $out_plot");
 
 system("rm ds_file memo pgplot.ps veto.fits sheild_events.dat");
 
