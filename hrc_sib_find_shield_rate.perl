@@ -7,9 +7,22 @@ use PGPLOT;
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: 07/15/09									#
+#	last update: Mar 07, 2013								#
 #												#
 #################################################################################################
+
+#
+#--- check whether this is a test case
+#
+$comp_test = $ARGV[0];
+chomp $comp_test;
+
+#
+#--- prep for test
+#
+if($comp_test =~ /test/i){
+	system("mkdir ./Test_out");
+}
 
 #
 #--- extract orbital data so that we can select proper shield rate later
@@ -41,24 +54,37 @@ $tot--;
 $otime_min = $otime[0];
 $otime_max = $otime[$tot-1];
 
-#
-#--- find today's date
-#
-
-($usec, $umin, $uhour, $umday, $umon, $uyear, $uwday, $uyday, $uisdst)= localtime(time);
-$year = $uyear + 1900;
-$month = $umon + 1;
-$today = "$year:$uyday:00:00:00";
+if($comp_test =~ /test/i){
 
 #
 #--- set dataseeker input file
 #
 
-open(OUT, '>./ds_file');
-print OUT 'columns=mtahrc..hrcveto_avg',"\n";
-print OUT 'timestart=1999:202:00:00:00',"\n";
-print OUT 'timestop='."$today\n";
-close(OUT);
+	open(OUT, '>./ds_file');
+	print OUT 'columns=mtahrc..hrcveto_avg',"\n";
+	print OUT 'timestart=2010:001:00:00:00',"\n";
+	print OUT 'timestop=2010:60:00:00:00',"\n";
+	close(OUT);
+}else{
+#
+#--- find today's date
+#
+
+	($usec, $umin, $uhour, $umday, $umon, $uyear, $uwday, $uyday, $uisdst)= localtime(time);
+	$year = $uyear + 1900;
+	$month = $umon + 1;
+	$today = "$year:$uyday:00:00:00";
+
+#
+#--- set dataseeker input file
+#
+
+	open(OUT, '>./ds_file');
+	print OUT 'columns=mtahrc..hrcveto_avg',"\n";
+	print OUT 'timestart=1999:202:00:00:00',"\n";
+	print OUT 'timestop='."$today\n";
+	close(OUT);
+}
 
 #
 #--- call dataseeker
@@ -77,59 +103,39 @@ $kstart = 0;
 OUTER:
 while(<FH>){
 	chomp $_;
-	@atemp = split(/\s+/, $_);
-	if($atemp[3] =~/\d/){
-		if($atemp[2] < $otime_min){
-			next OUTER;
-		}elsif($atemp[2] > $otime_max){
-			last OUTER;
-		}
+	$string = $_;
+	$string =~ s/^\s+//;
 
-		for($k = $kstart; $k < $tot; $k++){
-#
-#----dmlst produce a strange data output format; so we need two way to read data from a same file
-#
-			if($atemp[2] > $otime[$k-1] && $atemp[2] <= $otime[$k]){
+	@atemp = split(/\s+/, $string);
+
+	if($atemp[0] !~ /\d/){
+		next OUTER;
+	}
+
+	if($atemp[1] < $otime_min){
+		next OUTER;
+	}elsif($atemp[1] > $otime_max){
+		last OUTER;
+	}
+	for($k = $kstart; $k < $tot; $k++){
+		if($atemp[1] > $otime[$k-1] && $atemp[1] <= $otime[$k]){
 #
 #---- only data the geo-centric distance larger than 80,0000 km used
 #
-				if($dist[$k] > 80000){	
+			if($dist[$k] > 80000){
 #
 #--- modify date to DOM
 #
-					$date = $atemp[2] - 48902399;
-					$date /= 86400;
-					push(@time, $date);
-					push(@veto, $atemp[3]);
-					$count++;
-					$kstart = $k -4;
-					if($kstart < 0){
-						$kstart =0;
-					}
-					next OUTER;
+				$date = $atemp[1] - 48902399;
+				$date /= 86400;
+				push(@time, $date);
+				push(@veto, $atemp[2]);
+				$count++;
+				$kstart = $k -4;
+				if($kstart < 0){
+					$kstart =0;
 				}
-			}
-		}
-	}elsif($atemp[3] eq ''){
-		if($atemp[1] < $otime_min){
-			next OUTER;
-		}elsif($atemp[1] > $otime_max){
-			last OUTER;
-		}
-		for($k = $kstart; $k < $tot; $k++){
-			if($atemp[1] > $otime[$k-1] && $atemp[1] <= $otime[$k]){
-				if($dist[$k] > 80000){
-					$date = $atemp[1] - 48902399;
-					$date /= 86400;
-					push(@time, $date);
-					push(@veto, $atemp[2]);
-					$count++;
-					$kstart = $k -4;
-					if($kstart < 0){
-						$kstart =0;
-					}
-					next OUTER;
-				}
+				next OUTER;
 			}
 		}
 	}
@@ -137,24 +143,29 @@ while(<FH>){
 close(FH);
 
 @temp = sort{$a<=>$b} @time;
-$xmin = $temp[0];
-$xmin = 0;
+if($comp_test =~ /test/i){
+	$xmin = $temp[0];
+}else{
+	$xmin = 0;
+}
 $xmax = $temp[$count -1];
 $diff = int($xmax - $xmin);
 $xmax = $xmax + 0.05 * $diff;
 
-$sum  = 0;
-$scnt = 0;
-@avg  = ();
-@day  = ();
+$sum   = 0;
+$scnt  = 0;
+@avg   = ();
+@day   = ();
 $start = 0;
 $end   = 1;
-$dtot = 0;
+$dtot  = 0;
 
 #
 #---- modify data interval from 5 min to one day to reduce # of data points
 #
 
+$start = int($time[0]);
+$end   = $start + 1;
 OUTER:
 for($i = 0; $i < $count; $i++){
 	if($time[$i] > $start && $time[$i] <= $end){
@@ -162,7 +173,7 @@ for($i = 0; $i < $count; $i++){
 		$scnt++;
 	}elsif($time[$i] < $start){
 		next OUTER;	
-	}elsif($time[$i] > $diff){
+	}elsif($time[$i] > $xmax){
 		last OUTER;
 	}elsif($time[$i] > $end){
 		if($scnt > 0){
@@ -207,25 +218,41 @@ for($m = 0; $m < $dtot; $m++){
 pglab("Time (DOM)", "HRC Shield Rate (per Sec)", 'HRC Shield Rate Averaged Over One Day');
 pgclos();
 
-$out_plot = '/data/mta/www/mta_hrc/Trending/Bkg_data/shiled_rate.gif';
+if($comp_test =~ /test/i){
+	$out_plot = './Test_out/shiled_rate.gif';
+}else{
+	$out_plot = '/data/mta/www/mta_hrc/Trending/Bkg_data/shiled_rate.gif';
+}
 
 system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|pnmcrop|pnmflip -r270 |ppmtogif > $out_plot");
 
-system("rm ds_file memo pgplot.ps veto.fits sheild_events.dat");
+if($comp_test =~ /test/i){
+	system("mv sheild_events.dat ./Test_out/");
+	system("rm ds_file memo pgplot.ps veto.fits");
+}else{
+	system("rm ds_file memo pgplot.ps veto.fits sheild_events.dat");
+}
 
 
-open(OUT, '> /data/mta/www/mta_hrc/Trending/hrc_bkg.html');
+if($comp_test =~ /test/i){
+	open(OUT, "> ./Test_out/hrc_bkg.html");
+}else{
+	open(OUT, '> /data/mta/www/mta_hrc/Trending/hrc_bkg.html');
+}
 
+print OUT "<!DOCTYPE html>\n";
 print OUT '<html>',"\n";
-print OUT '<head><title>HRC SIB</title></head>',"\n";
-print OUT '<body TEXT="#000000" BGCOLOR="#FFFFFF">',"\n";
-print OUT '<center>',"\n";
+print OUT "<head>\n";
+print OUT "<title>HRC SIB</title>\n";
+print OUT "<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n";
+print OUT "</head>\n";
+print OUT '<body style="color:#000000;background-color:#FFFFFF">',"\n";
+print OUT '<div style="txt-align:center;margin-left:auto;margin-right:auto;padding-bottom:20px">',"\n";
 print OUT '<h2>Time History of HRC Istrument Background </h2>',"\n";
 print OUT '',"\n";
-print OUT '<img src ="./Bkg_data/shiled_rate.gif" width="500" height="500">',"\n";
+print OUT "<img src ='./Bkg_data/shiled_rate.gif' alt='shield rate' style='width:500px;height:500px'>\n";
 print OUT '',"\n";
-print OUT '</center>',"\n";
-print OUT '<br><br>',"\n";
+print OUT '</div>',"\n";
 
 if($month < 10){
 	$month = '0'."$month";
@@ -234,7 +261,12 @@ if($umday < 10){
 	$umday = '0'."$umday";
 }
 
+print OUT '<p>',"\n";
 print OUT 'Last Update:',"$month/$umday/$year\n";
+print OUT '</p>',"\n";
+
+print OUT "</body>\n";
+print OUT "</html>\n";
 
 close(OUT);
 
@@ -259,5 +291,9 @@ while(<FH>){
 close(OUT);
 close(FH);
 
-system("mv ./temp_out.html /data/mta_www/mta_hrc/Trending/hrc_trend.html");
+if($comp_test =~ /test/i){
+	system("mv ./temp_out.html ./Test_out/hrc_trend.html");
+}else{
+	system("mv ./temp_out.html /data/mta_www/mta_hrc/Trending/hrc_trend.html");
+}
 
