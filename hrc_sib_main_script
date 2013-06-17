@@ -1,13 +1,15 @@
-cd /data/mta/Script/HRC/Bkg/Exc/
+source /home/mta/.ascrc
+
 rm -rf param
 mkdir param
+source /home/mta/bin/reset_param
 
-source  /home/mta/bin/reset_param
-setenv PFILES "${PDIRS}"
+unsetenv PERLLIB
+unsetenv PERL5LIB
+
 set path = (/home/ascds/DS.release/bin/  $path)
-set path = (/home/ascds/DS.release/otsbin/  $path)
+set path = (/home/ascds/DS.release/ots/bin/ $path)
 
-
-/opt/local/bin/perl /data/mta/MTA/bin/hrc_sib_find_shield_rate.perl
+/usr/local/bin/perl /data/mta/Script/HRC/Bkg/HRC_SIB/hrc_sib_find_shield_rate.perl
 
 chgrp mtagroup /data/mta_www/mta_hrc/Trending/* /data/mta_www/mta_hrc/Trending/*/*

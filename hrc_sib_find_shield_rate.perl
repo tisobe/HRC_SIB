@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env /usr/local/bin/perl
 use PGPLOT;
 
 #################################################################################################
@@ -7,10 +7,11 @@ use PGPLOT;
 #												#
 #	author: t. isobe (tisobe@cfa.harvard.edu)						#
 #												#
-#	last update: Mar 07, 2013								#
+#	last update: Jun 05, 2013								#
 #												#
 #################################################################################################
 
+$house_keeping = '/data/mta/Script/HRC/house_keeping/';
 #
 #--- check whether this is a test case
 #
@@ -90,7 +91,7 @@ if($comp_test =~ /test/i){
 #--- call dataseeker
 #
 
-system("punlearn dataseeker; dataseeker.pl infile=ds_file print=yes outfile=veto.fits");
+system("punlearn dataseeker; dataseeker.pl infile=ds_file print=yes outfile=veto.fits loginFile=$house_keeping/loginfile");
 system("dmlist \"veto.fits[cols time,shevart_avg]\" outfile=sheild_events.dat opt=data");
 
 @time = ();
@@ -224,13 +225,13 @@ if($comp_test =~ /test/i){
 	$out_plot = '/data/mta/www/mta_hrc/Trending/Bkg_data/shiled_rate.gif';
 }
 
-system("echo ''|/opt/local/bin/gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|pnmcrop|pnmflip -r270 |ppmtogif > $out_plot");
+system("echo ''|gs -sDEVICE=ppmraw  -r256x256 -q -NOPAUSE -sOutputFile=-  ./pgplot.ps|pnmflip -r270 |ppmtogif > $out_plot");
 
 if($comp_test =~ /test/i){
 	system("mv sheild_events.dat ./Test_out/");
-	system("rm ds_file memo pgplot.ps veto.fits");
+	system("rm -rf ds_file memo pgplot.ps veto.fits");
 }else{
-	system("rm ds_file memo pgplot.ps veto.fits sheild_events.dat");
+	system("rm -rf ds_file memo pgplot.ps veto.fits sheild_events.dat");
 }
 
 
@@ -274,7 +275,7 @@ close(OUT);
 #---- update the main hrc trending page
 #
 
-open(FH, '/data/mta_www/mta_hrc/Trending/hrc_trend.html');
+open(FH, '/data/mta_www/mta_hrc/Trending2/hrc_trend.html');
 open(OUT, '>./temp_out.html');
 
 $chk = 0;
